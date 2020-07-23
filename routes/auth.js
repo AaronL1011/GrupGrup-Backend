@@ -32,7 +32,14 @@ router.post('/signup', async (req, res) => {
   try {
     const savedUser = await user.save();
     const token = jwt.sign({ _id: savedUser._id }, process.env.TOKEN_SECRET);
-    res.header('auth-token', token).json({ token });
+    res.json({
+      token,
+      user: {
+        id: savedUser._id,
+        username: savedUser.username,
+        email: savedUser.email
+      }
+    });
   } catch (error) {
     res.status(400).send(error);
   }
@@ -61,8 +68,15 @@ router.post('/login', async (req, res) => {
   }
 
   // Create and assign JWT
-  const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET);
-  res.header('auth-token', token).json({ token });
+  const token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET);
+  res.json({
+    token,
+    user: {
+      id: user._id,
+      username: user.username,
+      email: user.email
+    }
+  });
 });
 
 module.exports = router;
