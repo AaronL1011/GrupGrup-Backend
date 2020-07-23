@@ -19,12 +19,11 @@ router.post('/image-upload', verify, async function (req, res) {
       const post = new Post({
         images: urls,
         caption: req.body.caption,
-        tags: req.body.tags.split(', '),
+        tags: req.body.tags.toLowerCase().replace(/\s+/g, '').split(','),
         visibility: req.body.visibility
       });
 
       const current_user = await User.findById(req.user);
-      console.log(current_user);
       await post
         .save()
         .then(async (post) => {
@@ -37,11 +36,13 @@ router.post('/image-upload', verify, async function (req, res) {
           res.status(200).send(post);
         })
         .catch((error) => {
-          return res.status(400).send(error.message);
+          return res
+            .status(400)
+            .json({ error: error.errors.images.properties.message });
         });
     });
   } catch (error) {
-    console.log(error);
+    res.status(500).send('Internal Server Error.');
   }
 });
 

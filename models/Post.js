@@ -9,7 +9,7 @@ const PostSchema = mongoose.Schema({
   },
   images: {
     type: [String],
-    required: true
+    validate: [arrayMinSize, 'You need at least 1 image to post!']
   },
   visibility: {
     type: String,
@@ -20,5 +20,9 @@ const PostSchema = mongoose.Schema({
     default: Date.now
   }
 });
+
+function arrayMinSize(imageArray) {
+  return imageArray.length > 0;
+}
 
 module.exports = mongoose.model('Posts', PostSchema);
