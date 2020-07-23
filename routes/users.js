@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const User = require('../models/User');
 const verify = require('../utils/verify-token');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 router.get('/user', verify, async (req, res) => {
   const user = await User.findById(req.user);
@@ -74,10 +76,10 @@ router.delete('/delete', verify, async (req, res) => {
 // Verify if a token is valid
 router.post('/tokenIsValid', async (req, res) => {
   try {
-    const token = req.header('x-auth-token');
+    const token = req.header('auth-token');
     if (!token) return res.json(false);
 
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    const verified = jwt.verify(token, process.env.TOKEN_SECRET);
     if (!verified) return res.json(false);
 
     const user = await User.findById(verified.id);
