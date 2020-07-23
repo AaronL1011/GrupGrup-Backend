@@ -4,7 +4,7 @@
   "description": "created by Evelyn Papalouskas and Aaron Lewis for a Coder Academy final project.",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "nodemon app.js"
   },
   "repository": {
     "type": "git",

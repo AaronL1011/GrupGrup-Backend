@@ -2,6 +2,14 @@ const router = require('express').Router();
 const User = require('../models/User');
 const verify = require('../utils/verify-token');
 
+router.get('/user', verify, async (req, res) => {
+  const user = await User.findById(req.user);
+  res.json({
+    username: user.username,
+    id: user._id
+  });
+});
+
 // Get all users
 router.get('/', async (req, res) => {
   try {
@@ -37,49 +45,47 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update user information - PRIVATE ROUTE
-router.put('/:id', verify, async (req, res) => {
-  if (req.user._id === req.params.id) {
-    try {
-      await User.findByIdAndUpdate(req.params.id, req.body, { new: true })
-        .then((user) => {
-          return res.status(200).send(user);
-        })
-        .catch(() => {
-          return res
-            .status(404)
-            .send('User not found, please check and try again');
-        });
-    } catch (error) {
-      return res.status(500).send('Internal server error.');
-    }
-  } else {
-    return res.status(402).send('Unauthorized');
+router.put('/update', verify, async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user, req.body, { new: true })
+      .then((user) => {
+        return res.status(200).send(user);
+      })
+      .catch(() => {
+        return res
+          .status(404)
+          .send('User not found, please check and try again');
+      });
+  } catch (error) {
+    return res.status(500).send('Internal server error.');
   }
 });
 
 // Delete a user by their ID - PRIVATE ROUTE
-router.delete('/:id', verify, async (req, res) => {
-  if (req.user._id === req.params.id) {
-    try {
-      await User.findByIdAndRemove(req.params.id)
-        .then((user) => {
-          const response = {
-            message: 'User successfully deleted',
-            id: user._id
-          };
+router.delete('/delete', verify, async (req, res) => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.user);
+    return res.status(200).json(deletedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-          return res.status(200).json(response);
-        })
-        .catch(() => {
-          return res
-            .status(404)
-            .send('This user doesnt exist, please check and try again.');
-        });
-    } catch (error) {
-      res.status(500).send('Internal server error.');
-    }
-  } else {
-    return res.status(402).send('Unauthorized');
+// Verify if a token is valid
+router.post('/tokenIsValid', async (req, res) => {
+  try {
+    const token = req.header('x-auth-token');
+    if (!token) return res.json(false);
+
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    if (!verified) return res.json(false);
+
+    const user = await User.findById(verified.id);
+    if (!user) return res.json(false);
+
+    return res.json(true);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
