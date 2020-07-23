@@ -16,6 +16,9 @@ const UserSchema = mongoose.Schema({
   profile_picture: {
     type: String
   },
+  bio: {
+    type: String
+  },
   posts: {
     type: [String]
   }

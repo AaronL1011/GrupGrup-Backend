@@ -29,6 +29,30 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get user profile
+router.get('/:id/profile', async (req, res) => {
+  try {
+    await User.findById(req.params.id)
+      .then((user) => {
+        return res.status(200).json({
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          profilePicture: user.profile_picture,
+          bio: user.bio,
+          posts: user.posts
+        });
+      })
+      .catch(() => {
+        return res
+          .status(404)
+          .send('User doesnt exist, please check and try again');
+      });
+  } catch (error) {
+    return res.status(500).send('Internal server error.');
+  }
+});
+
 // Get a user by id
 router.get('/:id', async (req, res) => {
   try {
