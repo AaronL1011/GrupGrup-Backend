@@ -2,6 +2,8 @@ const router = require('express').Router();
 const verify = require('../utils/verify-token');
 const Post = require('../models/Post');
 const User = require('../models/User');
+const { AlexaForBusiness } = require('aws-sdk');
+const axios = require('axios');
 
 // Get all posts - PUBLIC ROUTE
 router.get('/', async (req, res) => {
@@ -34,34 +36,6 @@ router.get('/:id', async (req, res) => {
       });
   } catch (error) {
     return res.status(500).send('Internal server error.');
-  }
-});
-
-// Create a post - PRIVATE ROUTE
-router.post('/', verify, async (req, res) => {
-  const post = new Post({
-    images: req.body.images,
-    caption: req.body.caption,
-    tags: req.body.tags
-  });
-
-  try {
-    const current_user = await User.findById(req.user._id);
-
-    await post
-      .save()
-      .then((post) => {
-        current_user.updateOne({ posts: [post._id, ...current_user.posts] });
-        return post;
-      })
-      .then((post) => {
-        res.status(200).send(post);
-      })
-      .catch((error) => {
-        return res.status(400).send(error.message);
-      });
-  } catch (error) {
-    res.status(500).send('Internal server error.');
   }
 });
 
