@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const User = require('../models/User');
+const Post = require('../models/Post');
 const verify = require('../utils/verify-token');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -42,6 +43,30 @@ router.get('/:id/profile', async (req, res) => {
           bio: user.bio,
           posts: user.posts
         });
+      })
+      .catch(() => {
+        return res
+          .status(404)
+          .send('User doesnt exist, please check and try again');
+      });
+  } catch (error) {
+    return res.status(500).send('Internal server error.');
+  }
+});
+
+// Get user posts
+router.get('/:id/posts', async (req, res) => {
+  try {
+    await User.findById(req.params.id)
+      .then(async (user) => {
+        const userPosts = [];
+        for (i = 0; i < user.posts.length; i++) {
+          const post = await Post.findById(user.posts[i]);
+          if (post) {
+            userPosts.push(post);
+          }
+        }
+        return res.status(200).send(userPosts);
       })
       .catch(() => {
         return res
