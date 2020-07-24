@@ -5,11 +5,12 @@ const verify = require('../utils/verify-token');
 const Post = require('../models/Post');
 const User = require('../models/User');
 
-const imageUpload = upload.array('images', 4);
+const imageUploadMulti = upload.array('images', 4);
+const imageUploadSingle = upload.single('image');
 
 router.post('/image-upload', verify, async function (req, res) {
   try {
-    await imageUpload(req, res, async (error) => {
+    await imageUploadMulti(req, res, async (error) => {
       if (error) {
         return res.status(422).send({
           errors: [{ title: 'Invalid File Type', detail: error.message }]
@@ -39,6 +40,32 @@ router.post('/image-upload', verify, async function (req, res) {
           return res
             .status(400)
             .json({ error: error.errors.images.properties.message });
+        });
+    });
+  } catch (error) {
+    res.status(500).send('Internal Server Error.');
+  }
+});
+
+router.post('/profile-pic-upload', verify, async function (req, res) {
+  try {
+    await imageUploadSingle(req, res, async (error) => {
+      if (error) {
+        return res.status(422).send({
+          errors: [{ title: 'Invalid File Type', detail: error.message }]
+        });
+      }
+      const updatedProfilePicture = {
+        profile_picture: req.file.location
+      };
+      await User.findByIdAndUpdate(req.user, updatedProfilePicture, {
+        new: true
+      })
+        .then((user) => {
+          return res.status(200).send(user);
+        })
+        .catch((error) => {
+          res.status(400).send(error);
         });
     });
   } catch (error) {
