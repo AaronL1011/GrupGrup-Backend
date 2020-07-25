@@ -9,7 +9,7 @@ router.get('/user', verify, async (req, res) => {
   try {
     await User.findById(req.user)
       .then((user) => {
-        res.status(400).json({
+        res.status(200).json({
           username: user.username,
           id: user._id,
           url: user.profile_url
