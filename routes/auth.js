@@ -15,9 +15,17 @@ router.post('/signup', async (req, res) => {
     return res.status(400).send(error.details[0].message);
   }
 
-  const userAlreadyExists = await User.findOne({ email: req.body.email });
-  if (userAlreadyExists) {
+  const emailAlreadyExists = await User.findOne({ email: req.body.email });
+  if (emailAlreadyExists) {
     return res.status(400).send('A user with this email already exists');
+  }
+
+  const profileURLAlreadyExists = await User.findOne({
+    profile_url: req.body.profile_url.toLowerCase()
+  });
+
+  if (profileURLAlreadyExists) {
+    return res.status(400).send('A user with this profile url already exists');
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -26,6 +34,7 @@ router.post('/signup', async (req, res) => {
   const user = new User({
     username: req.body.username,
     email: req.body.email,
+    profile_url: req.body.profile_url.toLowerCase(),
     password: hashedPassword
   });
 
@@ -37,6 +46,7 @@ router.post('/signup', async (req, res) => {
       user: {
         id: savedUser._id,
         username: savedUser.username,
+        profile_url: savedUser.profile_url,
         email: savedUser.email
       }
     });

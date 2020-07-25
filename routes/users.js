@@ -31,22 +31,29 @@ router.get('/', async (req, res) => {
 });
 
 // Get user profile
-router.get('/:id/profile', async (req, res) => {
+router.get('/:profileUrl/profile', async (req, res) => {
   try {
-    await User.findById(req.params.id)
-      .then((user) => {
-        return res.status(200).json({
-          id: user._id,
-          username: user.username,
-          email: user.email,
-          profilePicture: user.profile_picture,
-          bio: user.bio,
-          posts: user.posts
-        });
+    await User.find({ profile_url: req.params.profileUrl })
+      .then(async (users) => {
+        if (users.length === 0) {
+          return res
+            .status(400)
+            .send('User doesnt exist, please check url and try again.');
+        } else {
+          const user = users[0];
+          return res.status(200).json({
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            profilePicture: user.profile_picture,
+            bio: user.bio,
+            posts: user.posts
+          });
+        }
       })
       .catch(() => {
         return res
-          .status(404)
+          .status(400)
           .send('User doesnt exist, please check and try again');
       });
   } catch (error) {
