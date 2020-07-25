@@ -73,7 +73,11 @@ router.post('/login', async (req, res) => {
 
   const validPassword = await bcrypt.compare(req.body.password, user.password);
   if (!validPassword) {
-    return res.status(400).send('Invalid Password');
+    return res
+      .status(400)
+      .send(
+        'Some details were incorrect, please check email and password and try again.'
+      );
   }
 
   // Create and assign JWT
