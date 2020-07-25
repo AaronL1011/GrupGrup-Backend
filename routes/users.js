@@ -3,8 +3,10 @@ const User = require('../models/User');
 const Post = require('../models/Post');
 const verify = require('../utils/verify-token');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
+// Get user info by token - PRIVATE ROUTE
 router.get('/user', verify, async (req, res) => {
   try {
     await User.findById(req.user)
@@ -128,6 +130,34 @@ router.put('/update', verify, async (req, res) => {
           .status(404)
           .send('User not found, please check and try again');
       });
+  } catch (error) {
+    return res.status(500).send('Internal server error.');
+  }
+});
+
+// Update user password - PRIVATE ROUTE
+router.put('/update-password', verify, async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+
+    const validPassword = await bcrypt.compare(
+      req.body.current_password,
+      user.password
+    );
+    if (validPassword) {
+      const salt = await bcrypt.genSalt(10);
+      const newHashedPassword = await bcrypt.hash(req.body.new_password, salt);
+      user.password = newHashedPassword;
+      await user.save().then((user) => {
+        return res.status(200).send(user);
+      });
+    } else {
+      return res
+        .status(400)
+        .send(
+          'Some details were incorrect, please check password and try again.'
+        );
+    }
   } catch (error) {
     return res.status(500).send('Internal server error.');
   }
