@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get user profile
-router.get('/:profileUrl/profile', async (req, res) => {
+router.get('/profile/:profileUrl', async (req, res) => {
   try {
     await User.find({ profile_url: req.params.profileUrl })
       .then(async (users) => {
