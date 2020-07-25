@@ -115,7 +115,7 @@ router.get('/:id', async (req, res) => {
 router.put('/update', verify, async (req, res) => {
   try {
     const emailAlreadyExists = await User.findOne({ email: req.body.email });
-    if (emailAlreadyExists) {
+    if (emailAlreadyExists && emailAlreadyExists.id !== req.user) {
       return res.status(400).send('A user with this email already exists');
     }
 
