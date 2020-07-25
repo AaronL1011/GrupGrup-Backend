@@ -46,7 +46,7 @@ router.post('/signup', async (req, res) => {
       user: {
         id: savedUser._id,
         username: savedUser.username,
-        profile_url: savedUser.profile_url
+        url: savedUser.profile_url
       }
     });
   } catch (error) {
