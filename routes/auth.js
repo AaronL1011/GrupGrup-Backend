@@ -46,8 +46,7 @@ router.post('/signup', async (req, res) => {
       user: {
         id: savedUser._id,
         username: savedUser.username,
-        profile_url: savedUser.profile_url,
-        email: savedUser.email
+        profile_url: savedUser.profile_url
       }
     });
   } catch (error) {
@@ -82,9 +81,9 @@ router.post('/login', async (req, res) => {
   res.json({
     token,
     user: {
-      id: user._id,
       username: user.username,
-      email: user.email
+      id: user._id,
+      url: user.profile_url
     }
   });
 });
