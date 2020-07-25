@@ -6,12 +6,21 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 router.get('/user', verify, async (req, res) => {
-  const user = await User.findById(req.user);
-  res.json({
-    username: user.username,
-    id: user._id,
-    url: user.profile_url
-  });
+  try {
+    await User.findById(req.user)
+      .then((user) => {
+        res.status(400).json({
+          username: user.username,
+          id: user._id,
+          url: user.profile_url
+        });
+      })
+      .catch((err) =>
+        res.send(400).send('User not found, please check and try again.')
+      );
+  } catch (error) {
+    res.status(500).send(error);
+  }
 });
 
 // Get all users
@@ -23,7 +32,7 @@ router.get('/', async (req, res) => {
       })
       .catch(() => {
         return res
-          .status(404)
+          .status(400)
           .send('Users not found, please check and try again');
       });
   } catch (error) {
