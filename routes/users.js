@@ -43,14 +43,13 @@ router.get('/', async (req, res) => {
 // Get user profile
 router.get('/profile/:profileUrl', async (req, res) => {
   try {
-    await User.find({ profile_url: req.params.profileUrl })
-      .then(async (users) => {
-        if (users.length === 0) {
+    await User.findOne({ profile_url: req.params.profileUrl })
+      .then(async (user) => {
+        if (!user) {
           return res
             .status(400)
             .send('User doesnt exist, please check url and try again.');
         } else {
-          const user = users[0];
           return res.status(200).json({
             id: user._id,
             username: user.username,
@@ -115,6 +114,11 @@ router.get('/:id', async (req, res) => {
 // Update user information - PRIVATE ROUTE
 router.put('/update', verify, async (req, res) => {
   try {
+    const emailAlreadyExists = await User.findOne({ email: req.body.email });
+    if (emailAlreadyExists) {
+      return res.status(400).send('A user with this email already exists');
+    }
+
     await User.findByIdAndUpdate(req.user, req.body, { new: true })
       .then((user) => {
         return res.status(200).send(user);
