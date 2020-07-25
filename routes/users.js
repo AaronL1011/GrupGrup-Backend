@@ -10,7 +10,7 @@ router.get('/user', verify, async (req, res) => {
   res.json({
     username: user.username,
     id: user._id,
-    url: user.profile_image_url
+    url: user.profile_url
   });
 });
 
