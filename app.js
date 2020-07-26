@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
-// const cors = require('cors');
+const cors = require('cors');
 
 const uploadRoute = require('./routes/image-upload');
 const authRoutes = require('./routes/auth');
@@ -14,6 +14,7 @@ const tagRoutes = require('./routes/tags');
 // Allow passing JSON objects and Cross Origin Resource Sharing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   next();
