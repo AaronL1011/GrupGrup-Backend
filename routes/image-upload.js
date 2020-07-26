@@ -18,6 +18,8 @@ router.post('/image-upload', verify, async function (req, res) {
       }
       const urls = req.files.map((file) => file.location);
       const post = new Post({
+        displayName: req.body.displayName,
+        authorID: req.body.authorID,
         images: urls,
         caption: req.body.caption,
         tags: req.body.tags.toLowerCase().replace(/\s+/g, '').split(','),
