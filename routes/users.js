@@ -167,6 +167,10 @@ router.put('/update-password', verify, async (req, res) => {
 router.delete('/delete', verify, async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.user);
+
+    for (let post of deletedUser.posts) {
+      await Post.findByIdAndDelete(post);
+    }
     return res.status(200).json(deletedUser);
   } catch (error) {
     res.status(500).json({ error: error.message });
