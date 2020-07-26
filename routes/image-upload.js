@@ -17,17 +17,16 @@ router.post('/api/image-upload', verify, async function (req, res) {
         });
       }
       const urls = req.files.map((file) => file.location);
-      if (req.body.tags) {
-        const tags = req.body.tags.toLowerCase().replace(/\s+/g, '').split(',');
-      } else {
-        const tags = req.body.tags;
-      }
+
+      let tags = req.body.tags
+        ? req.body.tags.toLowerCase().replace(/\s+/g, '').split(',')
+        : req.body.tags;
       const post = new Post({
         displayName: req.body.displayName,
         authorID: req.body.authorID,
         images: urls,
         caption: req.body.caption,
-        tags: tags,
+        tags,
         visibility: req.body.visibility
       });
 
