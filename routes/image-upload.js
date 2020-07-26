@@ -17,8 +17,11 @@ router.post('/api/image-upload', verify, async function (req, res) {
         });
       }
       const urls = req.files.map((file) => file.location);
-      const tags =
-        req.body.tags.toLowerCase().replace(/\s+/g, '').split(',') || null;
+      if (req.body.tags) {
+        const tags = req.body.tags.toLowerCase().replace(/\s+/g, '').split(',');
+      } else {
+        const tags = req.body.tags;
+      }
       const post = new Post({
         displayName: req.body.displayName,
         authorID: req.body.authorID,
