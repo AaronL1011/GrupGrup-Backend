@@ -39,9 +39,7 @@ router.post('/api/image-upload', verify, async function (req, res) {
           res.status(200).send(post);
         })
         .catch((error) => {
-          return res
-            .status(400)
-            .json({ error: error.errors.images.properties.message });
+          return res.status(400).json({ error });
         });
     });
   } catch (error) {
