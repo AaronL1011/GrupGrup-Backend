@@ -8,7 +8,7 @@ const User = require('../models/User');
 const imageUploadMulti = upload.array('images', 4);
 const imageUploadSingle = upload.single('image');
 
-router.post('/image-upload', verify, async function (req, res) {
+router.post('/api/image-upload', verify, async function (req, res) {
   try {
     await imageUploadMulti(req, res, async (error) => {
       if (error) {
@@ -49,7 +49,7 @@ router.post('/image-upload', verify, async function (req, res) {
   }
 });
 
-router.post('/profile-pic-upload', verify, async function (req, res) {
+router.post('/api/profile-pic-upload', verify, async function (req, res) {
   try {
     await imageUploadSingle(req, res, async (error) => {
       if (error) {
