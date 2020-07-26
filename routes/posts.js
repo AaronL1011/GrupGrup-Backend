@@ -62,7 +62,7 @@ router.put('/:id', verify, async (req, res) => {
 
 // Delete a post - PRIVATE ROUTE
 router.delete('/:id', verify, async (req, res) => {
-  const current_user = await User.findById(req.user._id);
+  const current_user = await User.findById(req.user);
 
   if (current_user.posts.includes(req.params.id)) {
     try {
