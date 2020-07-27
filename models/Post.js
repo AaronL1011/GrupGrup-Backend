@@ -9,6 +9,10 @@ const PostSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  authorURL: {
+    type: String,
+    required: true
+  },
   caption: {
     type: String
   },

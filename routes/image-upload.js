@@ -24,6 +24,7 @@ router.post('/api/image-upload', verify, async function (req, res) {
       const post = new Post({
         displayName: req.body.displayName,
         authorID: req.body.authorID,
+        authorURL: req.body.authorURL,
         images: urls,
         caption: req.body.caption,
         tags,
