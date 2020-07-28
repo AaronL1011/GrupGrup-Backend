@@ -40,7 +40,7 @@ router.post('/api/image-upload', verify, async function (req, res) {
           return res.status(200).send(post);
         })
         .catch((error) => {
-          return res.status(400).send(error);
+          return res.status(400).send('You need at least 1 image to post!');
         });
     });
   } catch (error) {
