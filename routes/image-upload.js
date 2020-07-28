@@ -12,10 +12,9 @@ router.post('/api/image-upload', verify, async function (req, res) {
   try {
     await imageUploadMulti(req, res, async (error) => {
       if (error) {
-        return res.status(422).send({
-          errors: [{ title: 'Invalid File Type', detail: error.message }]
-        });
+        return res.status(422).send('Invalid file type, try another photo!');
       }
+
       const urls = req.files.map((file) => file.location);
 
       let tags = req.body.tags
@@ -38,18 +37,16 @@ router.post('/api/image-upload', verify, async function (req, res) {
           await current_user.updateOne({
             posts: [post._id, ...current_user.posts]
           });
-          post.save();
-          return post;
-        })
-        .then((post) => {
-          res.status(200).send(post);
+          return res.status(200).send(post);
         })
         .catch((error) => {
-          return res.status(400).json({ error });
+          return res.status(400).send('You need at least 1 image to post!');
         });
     });
   } catch (error) {
-    res.status(500).send('Internal Server Error.');
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 });
 
@@ -57,9 +54,7 @@ router.post('/api/profile-pic-upload', verify, async function (req, res) {
   try {
     await imageUploadSingle(req, res, async (error) => {
       if (error) {
-        return res.status(422).send({
-          errors: [{ title: 'Invalid File Type', detail: error.message }]
-        });
+        return res.status(422).send('Invalid file type, try another photo!');
       }
       const updatedProfilePicture = {
         profile_picture: req.file.location
@@ -71,11 +66,13 @@ router.post('/api/profile-pic-upload', verify, async function (req, res) {
           return res.status(200).send(user);
         })
         .catch((error) => {
-          res.status(400).send(error);
+          res.status(400).send('User not found, please check and try again');
         });
     });
   } catch (error) {
-    res.status(500).send('Internal Server Error.');
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 });
 
