@@ -38,6 +38,7 @@ router.post('/api/image-upload', verify, async function (req, res) {
           await current_user.updateOne({
             posts: [post._id, ...current_user.posts]
           });
+          post.save();
           return post;
         })
         .then((post) => {
