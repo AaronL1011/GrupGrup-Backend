@@ -22,7 +22,6 @@ describe('User Retrieval', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(7);
 
           userId = res.body[3]._id;
           done();
@@ -128,13 +127,13 @@ describe('User Auth', () => {
   });
 
   describe('/POST api/users/tokenIsValid', () => {
-    it('should return true/false for a valid token', (done) => {
+    it('should return true for a valid token', (done) => {
       chai
         .request(server)
         .post('/api/users/tokenIsValid')
         .set('auth-token', token)
         .end((err, res) => {
-          res.body.should.be.a('boolean');
+          res.body.should.equal(true);
           done();
         });
     });
@@ -218,7 +217,7 @@ describe('User Modification', () => {
 
       chai
         .request(server)
-        .put('/api/users/update')
+        .put('/api/users/update-password')
         .set('auth-token', token)
         .send(body)
         .end((err, res) => {

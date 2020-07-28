@@ -78,7 +78,7 @@ router.delete('/:id', verify, async (req, res) => {
         })
         .catch(() => {
           return res
-            .status(404)
+            .status(400)
             .send('This post doesnt exist, please check and try again.');
         });
     } catch (error) {
@@ -87,9 +87,7 @@ router.delete('/:id', verify, async (req, res) => {
         .send('Something went wrong... Refresh and try again!');
     }
   } else {
-    return res
-      .status(401)
-      .send('Either you are unauthorized, or this post doesnt exist.');
+    return res.status(400).send('Post not found, please check and try again');
   }
 });
 

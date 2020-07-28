@@ -115,12 +115,23 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+function emailIsValid(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 // Update user information - PRIVATE ROUTE
 router.put('/update', verify, async (req, res) => {
   try {
     const emailAlreadyExists = await User.findOne({ email: req.body.email });
     if (emailAlreadyExists && emailAlreadyExists.id !== req.user) {
       return res.status(400).send('A user with this email already exists');
+    }
+
+    const validEmail = emailIsValid(req.body.email);
+    if (req.body.email === '' || !validEmail) {
+      return res
+        .status(400)
+        .send('Please check that you entered a valid email!');
     }
 
     await User.findByIdAndUpdate(req.user, req.body, { new: true })
@@ -139,9 +150,19 @@ router.put('/update', verify, async (req, res) => {
   }
 });
 
+function passwordIsValid(password) {
+  return password.length > 6;
+}
+
 // Update user password - PRIVATE ROUTE
 router.put('/update-password', verify, async (req, res) => {
   try {
+    const validNewPassword = passwordIsValid(req.body.new_password);
+    if (!validNewPassword) {
+      return res
+        .status(400)
+        .send('Password must be a minimum of 6 characters!');
+    }
     const user = await User.findById(req.user);
 
     const validPassword = await bcrypt.compare(
@@ -196,19 +217,17 @@ router.delete('/delete', verify, async (req, res) => {
 router.post('/tokenIsValid', async (req, res) => {
   try {
     const token = req.header('auth-token');
-    if (!token) return res.json(false);
+    if (!token) return res.status(400).json(false);
 
     const verified = jwt.verify(token, process.env.TOKEN_SECRET);
-    if (!verified) return res.json(false);
+    if (!verified) return res.status(400).json(false);
 
     const user = await User.findById(verified.id);
-    if (!user) return res.json(false);
+    if (!user) return res.status(400).json(false);
 
-    return res.json(true);
+    return res.status(200).send(true);
   } catch (error) {
-    return res
-      .status(500)
-      .send('Something went wrong... Refresh and try again!');
+    return res.status(400).send(false);
   }
 });
 

@@ -163,8 +163,6 @@ describe('Post Modification', () => {
           // console.log(res);
           res.should.have.status(200);
           res.body.should.be.a('object');
-          res.body.should.have.property('id');
-          res.body.should.have.property('message');
           done();
         });
     });
