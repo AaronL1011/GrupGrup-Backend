@@ -13,7 +13,7 @@ module.exports = function (req, res, next) {
         .status(401)
         .json({ msg: 'Token verification failed, authorization denied.' });
 
-    req.user = verified._id;
+    req.user = verified.id;
     next();
   } catch (err) {
     res.status(500).json({ error: err.message });
