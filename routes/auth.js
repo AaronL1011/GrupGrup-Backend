@@ -41,7 +41,7 @@ router.post('/signup', async (req, res) => {
   try {
     const savedUser = await user.save();
     const token = jwt.sign({ id: savedUser._id }, process.env.TOKEN_SECRET);
-    res.json({
+    return res.json({
       token,
       user: {
         id: savedUser._id,
@@ -50,7 +50,9 @@ router.post('/signup', async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(400).send(error);
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 });
 
@@ -79,17 +81,22 @@ router.post('/login', async (req, res) => {
         'Some details were incorrect, please check email and password and try again.'
       );
   }
-
-  // Create and assign JWT
-  const token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET);
-  res.json({
-    token,
-    user: {
-      username: user.username,
-      id: user._id,
-      url: user.profile_url
-    }
-  });
+  try {
+    // Create and assign JWT
+    const token = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET);
+    return res.json({
+      token,
+      user: {
+        username: user.username,
+        id: user._id,
+        url: user.profile_url
+      }
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
+  }
 });
 
 module.exports = router;

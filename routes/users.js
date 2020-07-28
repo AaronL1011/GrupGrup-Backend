@@ -11,15 +11,15 @@ router.get('/user', verify, async (req, res) => {
   try {
     await User.findById(req.user)
       .then((user) => {
-        res.status(200).json({
+        return res.status(200).json({
           username: user.username,
           id: user._id,
           url: user.profile_url
         });
       })
-      .catch((err) =>
-        res.send(400).send('User not found, please check and try again.')
-      );
+      .catch((err) => {
+        return res.send(400).send('User not found, please check and try again');
+      });
   } catch (error) {
     res.status(500).send(error);
   }
@@ -35,10 +35,12 @@ router.get('/', async (req, res) => {
       .catch(() => {
         return res
           .status(400)
-          .send('Users not found, please check and try again');
+          .send('No users found, please check and try again');
       });
   } catch (error) {
-    return res.status(500).send('Internal server error.');
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 });
 
@@ -46,21 +48,15 @@ router.get('/', async (req, res) => {
 router.get('/profile/:profileUrl', async (req, res) => {
   try {
     await User.findOne({ profile_url: req.params.profileUrl })
-      .then(async (user) => {
-        if (!user) {
-          return res
-            .status(400)
-            .send('User doesnt exist, please check url and try again.');
-        } else {
-          return res.status(200).json({
-            id: user._id,
-            username: user.username,
-            email: user.email,
-            profilePicture: user.profile_picture,
-            bio: user.bio,
-            posts: user.posts
-          });
-        }
+      .then((user) => {
+        return res.status(200).json({
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          profilePicture: user.profile_picture,
+          bio: user.bio,
+          posts: user.posts
+        });
       })
       .catch(() => {
         return res
@@ -68,7 +64,9 @@ router.get('/profile/:profileUrl', async (req, res) => {
           .send('User doesnt exist, please check and try again');
       });
   } catch (error) {
-    return res.status(500).send('Internal server error.');
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 });
 
@@ -88,11 +86,13 @@ router.get('/:id/posts', async (req, res) => {
       })
       .catch(() => {
         return res
-          .status(404)
+          .status(400)
           .send('User doesnt exist, please check and try again');
       });
   } catch (error) {
-    return res.status(500).send('Internal server error.');
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 });
 
@@ -105,11 +105,13 @@ router.get('/:id', async (req, res) => {
       })
       .catch(() => {
         return res
-          .status(404)
+          .status(400)
           .send('User doesnt exist, please check and try again');
       });
   } catch (error) {
-    return res.status(500).send('Internal server error.');
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 });
 
@@ -127,11 +129,13 @@ router.put('/update', verify, async (req, res) => {
       })
       .catch(() => {
         return res
-          .status(404)
+          .status(400)
           .send('User not found, please check and try again');
       });
   } catch (error) {
-    return res.status(500).send('Internal server error.');
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 });
 
@@ -144,6 +148,7 @@ router.put('/update-password', verify, async (req, res) => {
       req.body.current_password,
       user.password
     );
+
     if (validPassword) {
       const salt = await bcrypt.genSalt(10);
       const newHashedPassword = await bcrypt.hash(req.body.new_password, salt);
@@ -159,21 +164,31 @@ router.put('/update-password', verify, async (req, res) => {
         );
     }
   } catch (error) {
-    return res.status(500).send('Internal server error.');
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 });
 
-// Delete a user by their ID - PRIVATE ROUTE
+// Delete a user by their token - PRIVATE ROUTE
 router.delete('/delete', verify, async (req, res) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.user);
-
-    for (let post of deletedUser.posts) {
-      await Post.findByIdAndDelete(post);
-    }
-    return res.status(200).json(deletedUser);
+    await User.findByIdAndDelete(req.user)
+      .then(async (user) => {
+        for (let post of user.posts) {
+          await Post.findByIdAndDelete(post);
+        }
+        return res.status(200).send(user);
+      })
+      .catch(() => {
+        return res
+          .status(400)
+          .send('User not found, please check and try again');
+      });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 });
 
@@ -190,8 +205,10 @@ router.post('/tokenIsValid', async (req, res) => {
     if (!user) return res.json(false);
 
     return res.json(true);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 });
 

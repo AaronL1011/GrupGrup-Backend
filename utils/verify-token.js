@@ -15,7 +15,9 @@ module.exports = function (req, res, next) {
 
     req.user = verified.id;
     next();
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  } catch (error) {
+    return res
+      .status(500)
+      .send('Something went wrong... Refresh and try again!');
   }
 };
