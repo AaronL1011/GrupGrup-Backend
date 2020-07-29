@@ -133,8 +133,7 @@ router.put('/update', verify, async (req, res) => {
         .status(400)
         .send('Please check that you entered a valid email!');
     }
-
-    if (req.body.username && req.body.username === '') {
+    if (req.body.username === '') {
       return res
         .status(400)
         .send('Please check that you entered a valid username!');
