@@ -22,7 +22,6 @@ describe('Post Retrieval', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('array');
-          res.body.length.should.be.eql(10);
 
           postId = res.body[1]._id;
           done();

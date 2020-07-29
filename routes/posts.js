@@ -70,11 +70,17 @@ router.put('/:id', verify, async (req, res) => {
 router.delete('/:id', verify, async (req, res) => {
   const current_user = await User.findById(req.user);
 
+  let updatedPosts = current_user.posts.filter(
+    (post) => post !== req.params.id
+  );
+
   if (current_user.posts.includes(req.params.id)) {
     try {
       await Post.findByIdAndRemove(req.params.id)
-        .then(() => {
-          return res.status(200).send('Post successfully deleted.');
+        .then(async () => {
+          await current_user.updateOne({ posts: updatedPosts }).then(() => {
+            return res.status(200).send('Post successfully deleted.');
+          });
         })
         .catch(() => {
           return res
