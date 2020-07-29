@@ -134,6 +134,12 @@ router.put('/update', verify, async (req, res) => {
         .send('Please check that you entered a valid email!');
     }
 
+    if (req.body.username && req.body.username === '') {
+      return res
+        .status(400)
+        .send('Please check that you entered a valid username!');
+    }
+
     await User.findByIdAndUpdate(req.user, req.body, { new: true })
       .then((user) => {
         return res.status(200).send(user);
